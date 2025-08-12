@@ -19,9 +19,9 @@ API_URL = "https://gufranrana-rag-api-manual-01.hf.space"
 def query_rag_system(query: str):
     """Send query to the RAG endpoint and return results"""
     try:
-        response = requests.post(
+        response = requests.get(
             f"{API_URL}/ask",
-            params={"question": query},  # FastAPI expects it as a query param
+            params={"question": query},  # Use GET with query parameters
             timeout=60,
         )
         response.raise_for_status()
@@ -39,6 +39,18 @@ def query_rag_system(query: str):
 
 # Create the main query interface
 st.markdown("Enter your query to get AI-generated responses based on the documents.")
+
+# Add API status indicator
+col_status1, col_status2, col_status3 = st.columns([1, 2, 1])
+with col_status2:
+    try:
+        test_response = requests.get(f"{API_URL}/ask?question=test", timeout=10)
+        if test_response.status_code == 200:
+            st.success("🟢 API Status: Working")
+        else:
+            st.warning(f"🟡 API Status: {test_response.status_code}")
+    except:
+        st.error("🔴 API Status: Unreachable")
 
 # Use columns for layout
 col1, col2 = st.columns([4, 1])
